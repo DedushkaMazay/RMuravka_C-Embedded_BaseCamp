@@ -1,0 +1,30 @@
+!SESSION 2021-11-01 18:13:35.244 -----------------------------------------------
+eclipse.buildId=Version 1.7.0
+java.version=11.0.10
+java.vendor=AdoptOpenJDK
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=ru_UA
+Command-line arguments:  -data /home/dedushka-mazay/GIT/RMuravka_C-Embedded_BaseCamp/mySecondProject -os linux -ws gtk -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2021-11-01 18:13:39.130
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2021-11-01 18:13:39.171
+!MESSAGE Log4j initialized with config file /home/dedushka-mazay/GIT/RMuravka_C-Embedded_BaseCamp/mySecondProject/.metadata/.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2021-11-01 18:13:40.656
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2021-11-01 18:14:18.656 -----------------------------------------------
+eclipse.buildId=Version 1.7.0
+java.version=11.0.10
+java.vendor=AdoptOpenJDK
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=ru_UA
+Command-line arguments:  -data /home/dedushka-mazay/GIT/RMuravka_C-Embedded_BaseCamp/mySecondProject -os linux -ws gtk -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2021-11-01 18:14:21.923
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2021-11-01 18:14:21.967
+!MESSAGE Log4j initialized with config file /home/dedushka-mazay/GIT/RMuravka_C-Embedded_BaseCamp/mySecondProject/.metadata/.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2021-11-01 18:14:23.868
+!MESSAGE Started RMI Server, listening on port 41337
