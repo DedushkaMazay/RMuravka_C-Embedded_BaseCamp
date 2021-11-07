@@ -98,8 +98,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  TIM4 -> PSC = (MAX_IN_FREQUENCY / getFrequency()) - 1;
-	  switch (getLeds())
+	  TIM4 -> PSC = (MAX_IN_FREQUENCY / getFrequency()) - 1; //Увел. или умен. частоты
+	  switch (getLeds()) //Переключение светодиодов с увел. или с умен. рабочего цикла
 	  {
 	  	  case GPIO_PIN_12:
 	  		HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);

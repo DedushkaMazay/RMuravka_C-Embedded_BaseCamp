@@ -202,7 +202,7 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles EXTI line[9:5] interrupts.
   */
-void EXTI9_5_IRQHandler(void)
+void EXTI9_5_IRQHandler(void) //Действия с кнопками в функции HAL_GPIO_EXTI_Callback
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
   /* USER CODE END EXTI9_5_IRQn 0 */
@@ -217,7 +217,7 @@ void EXTI9_5_IRQHandler(void)
 /**
   * @brief This function handles EXTI line[15:10] interrupts.
   */
-void EXTI15_10_IRQHandler(void)
+void EXTI15_10_IRQHandler(void) //Действия с кнопками в функции HAL_GPIO_EXTI_Callback
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
 
