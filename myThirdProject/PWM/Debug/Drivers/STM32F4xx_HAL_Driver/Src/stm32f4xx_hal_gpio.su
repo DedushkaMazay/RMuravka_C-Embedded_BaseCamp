@@ -5,7 +5,7 @@ stm32f4xx_hal_gpio.c:414:6:HAL_GPIO_WritePin	16	static
 stm32f4xx_hal_gpio.c:437:6:HAL_GPIO_TogglePin	24	static
 stm32f4xx_hal_gpio.c:462:19:HAL_GPIO_LockPin	24	static
 stm32f4xx_hal_gpio.c:496:6:HAL_GPIO_EXTI_IRQHandler	16	static
-stm32f4xx_hal_gpio.c:515:5:getLeds	4	static
-stm32f4xx_hal_gpio.c:519:5:getCycle	4	static
-stm32f4xx_hal_gpio.c:523:5:getFrequency	4	static
-stm32f4xx_hal_gpio.c:528:6:HAL_GPIO_EXTI_Callback	16	static
+stm32f4xx_hal_gpio.c:516:5:getLeds	4	static
+stm32f4xx_hal_gpio.c:520:5:getCycle	4	static
+stm32f4xx_hal_gpio.c:524:5:getFrequency	4	static
+stm32f4xx_hal_gpio.c:529:6:HAL_GPIO_EXTI_Callback	16	static

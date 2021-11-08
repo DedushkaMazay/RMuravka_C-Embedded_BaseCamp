@@ -32,8 +32,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MAX_IN_FREQUENCY 20000000
-#define COUNT_PERIOD 1000
+#define MAX_IN_FREQUENCY 50000000
+#define COUNT_PERIOD 100
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -98,7 +98,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  TIM4 -> PSC = (MAX_IN_FREQUENCY / getFrequency()) - 1; //Увел. или умен. частоты
+	  TIM4 -> PSC = ((MAX_IN_FREQUENCY / getFrequency()) / COUNT_PERIOD) - 1; //Увел. или умен. частоты
 	  switch (getLeds()) //Переключение светодиодов с увел. или с умен. рабочего цикла
 	  {
 	  	  case GPIO_PIN_12:
@@ -150,9 +150,9 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 5;
+  RCC_OscInitStruct.PLL.PLLM = 4;
   RCC_OscInitStruct.PLL.PLLN = 100;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -167,7 +167,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
   {
     Error_Handler();
   }
@@ -192,9 +192,9 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 3999;
+  htim4.Init.Prescaler = 99;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 999;
+  htim4.Init.Period = 99;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
@@ -208,7 +208,7 @@ static void MX_TIM4_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 50;
+  sConfigOC.Pulse = 5;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)

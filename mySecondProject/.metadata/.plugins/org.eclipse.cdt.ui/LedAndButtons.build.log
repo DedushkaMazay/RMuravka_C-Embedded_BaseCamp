@@ -1,0 +1,69 @@
+19:38:37 **** Incremental Build of configuration Debug for project LedAndButtons ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:96:29: warning: passing argument 2 of 'HAL_GPIO_WritePin' makes integer from pointer without a cast [-Wint-conversion]
+   96 |    HAL_GPIO_WritePin(GPIOD, LD1_4, GPIO_PIN_SET);
+      |                             ^~~~~
+      |                             |
+      |                             unsigned int *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:278,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:30,
+                 from ../Core/Inc/main.h:31,
+                 from ../Core/Src/main.c:21:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h:236:54: note: expected 'uint16_t' {aka 'short unsigned int'} but argument is of type 'unsigned int *'
+  236 | void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);
+      |                                             ~~~~~~~~~^~~~~~~~
+../Core/Src/main.c:98:29: warning: passing argument 2 of 'HAL_GPIO_WritePin' makes integer from pointer without a cast [-Wint-conversion]
+   98 |    HAL_GPIO_WritePin(GPIOD, LD1_4, GPIO_PIN_RESET);
+      |                             ^~~~~
+      |                             |
+      |                             unsigned int *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:278,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:30,
+                 from ../Core/Inc/main.h:31,
+                 from ../Core/Src/main.c:21:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h:236:54: note: expected 'uint16_t' {aka 'short unsigned int'} but argument is of type 'unsigned int *'
+  236 | void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);
+      |                                             ~~~~~~~~~^~~~~~~~
+../Core/Src/main.c:134:31: warning: passing argument 2 of 'HAL_GPIO_WritePin' makes integer from pointer without a cast [-Wint-conversion]
+  134 |      HAL_GPIO_WritePin(GPIOD, LD1_4, GPIO_PIN_SET);
+      |                               ^~~~~
+      |                               |
+      |                               unsigned int *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:278,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:30,
+                 from ../Core/Inc/main.h:31,
+                 from ../Core/Src/main.c:21:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h:236:54: note: expected 'uint16_t' {aka 'short unsigned int'} but argument is of type 'unsigned int *'
+  236 | void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);
+      |                                             ~~~~~~~~~^~~~~~~~
+../Core/Src/main.c:138:31: warning: passing argument 2 of 'HAL_GPIO_WritePin' makes integer from pointer without a cast [-Wint-conversion]
+  138 |      HAL_GPIO_WritePin(GPIOD, LD1_4, GPIO_PIN_RESET);
+      |                               ^~~~~
+      |                               |
+      |                               unsigned int *
+In file included from ../Core/Inc/stm32f4xx_hal_conf.h:278,
+                 from ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:30,
+                 from ../Core/Inc/main.h:31,
+                 from ../Core/Src/main.c:21:
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h:236:54: note: expected 'uint16_t' {aka 'short unsigned int'} but argument is of type 'unsigned int *'
+  236 | void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);
+      |                                             ~~~~~~~~~^~~~~~~~
+arm-none-eabi-gcc -o "LedAndButtons.elf" @"objects.list"   -mcpu=cortex-m4 -T"/home/dedushka-mazay/GIT/RMuravka_C-Embedded_BaseCamp/mySecondProject/LedAndButtons/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="LedAndButtons.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: LedAndButtons.elf
+ 
+arm-none-eabi-size   LedAndButtons.elf 
+arm-none-eabi-objdump -h -S  LedAndButtons.elf  > "LedAndButtons.list"
+arm-none-eabi-objcopy  -O binary  LedAndButtons.elf  "LedAndButtons.bin"
+   text	   data	    bss	    dec	    hex	filename
+   6556	     24	   1568	   8148	   1fd4	LedAndButtons.elf
+Finished building: default.size.stdout
+ 
+Finished building: LedAndButtons.bin
+ 
+Finished building: LedAndButtons.list
+ 
+
+19:38:38 Build Finished. 0 errors, 4 warnings. (took 367ms)
+

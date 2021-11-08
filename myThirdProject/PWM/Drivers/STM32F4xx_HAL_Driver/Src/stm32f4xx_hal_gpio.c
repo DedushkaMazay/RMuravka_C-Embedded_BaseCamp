@@ -510,12 +510,12 @@ void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin)
   */
 /*Обьявление переменных рабочего цикла, частоты, адресов светодиодов*/
 unsigned  static int cycle = 5;
-unsigned  static int frequency = MIN_FREQUENCY;
-static int LD1_4 = GPIO_PIN_12;
+unsigned  static long int frequency = MIN_FREQUENCY;
+unsigned static int LD1_4 [] = {GPIO_PIN_12, GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15}, pin = 0;
 /*Функции для передачи значений в главную программу*/
 int getLeds(void)
 {
-	 return LD1_4;
+	 return LD1_4[pin];
 }
 int getCycle (void)
 	 {
@@ -560,10 +560,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	 	 	 	break;
 
 	case GPIO_PIN_15://SWT2 - Переключение светодиодов по часовой стрелке
-		 if (LD1_4 == GPIO_PIN_15)
-			 LD1_4 = GPIO_PIN_12;
+		 if (LD1_4[pin] == GPIO_PIN_15)
+			 pin = 0; //GPIO_PIN_12;
 		 else
-			 LD1_4 *= 2;
+			 pin++;
 		 break;
 	}
 }

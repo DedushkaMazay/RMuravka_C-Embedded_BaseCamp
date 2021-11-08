@@ -64,7 +64,7 @@ static void MX_GPIO_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	unsigned int LD1_4 = GPIO_PIN_12; // Обьявление и инициализация переменной для хранения адресов портов (0х1000 - 0х8000)  ;
+
 
   /* USER CODE END 1 */
 
@@ -87,14 +87,17 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
+
+  unsigned int LD1_4 [4] = {GPIO_PIN_12, GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15}; // Обьявление и инициализация переменной для хранения адресов портов (0х1000 - 0х8000)  ;
+  unsigned int pin = 0;
+
   for (int i = 0; i < 5; i++) //Проверка всех светодиодов перед работой программы;
   {
-	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(GPIOD, LD1_4, GPIO_PIN_SET);
 	  HAL_Delay(50);
-	  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
+	  HAL_GPIO_WritePin(GPIOD, LD1_4, GPIO_PIN_RESET);
 	  HAL_Delay(50);
   }
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -102,37 +105,37 @@ int main(void)
   while (1)
   {
 
-	  HAL_GPIO_WritePin(GPIOD, LD1_4, GPIO_PIN_SET);
+	  HAL_GPIO_WritePin(GPIOD, LD1_4[pin], GPIO_PIN_SET);
 	  HAL_Delay(del/2);
-	  HAL_GPIO_WritePin(GPIOD, LD1_4, GPIO_PIN_RESET);
+	  HAL_GPIO_WritePin(GPIOD, LD1_4[pin], GPIO_PIN_RESET);
 	  HAL_Delay(del/2);
 
 
 	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_8) == GPIO_PIN_RESET) // Переключение светодиода по часовой стрелке
 	  {
 		  HAL_Delay(1000);
-		  if (LD1_4 == GPIO_PIN_15)
-			  LD1_4 = GPIO_PIN_12;
+		  if (LD1_4[pin] == GPIO_PIN_15)
+			  pin = 0; //GPIO_PIN_12;
 		  else
-			  LD1_4 *= 2;
+			  pin++;
 	  }
 
 	  if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_6) == GPIO_PIN_RESET) // Переключение светодиода против часовой стрелки
-	  	  {
-		  	  HAL_Delay(1000);
-	  		  if (LD1_4 == GPIO_PIN_12)
-	  			  LD1_4 = GPIO_PIN_15;
+	  {
+	  		  HAL_Delay(1000);
+	  		  if (LD1_4[pin] == GPIO_PIN_12)
+	  			  pin = 4; //GPIO_PIN_15;
 	  		  else
-	  			  LD1_4 /= 2;
+	  			  pin--;
 	  	  }
 	  if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_RESET) // Пауза и возобновление
 		  {
 			  HAL_Delay(1000);
-			  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_SET);
+			  HAL_GPIO_WritePin(GPIOD, LD1_4, GPIO_PIN_SET);
 			  while (1)
 				  if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_RESET)
 					  break;
-			  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15, GPIO_PIN_RESET);
+			  HAL_GPIO_WritePin(GPIOD, LD1_4, GPIO_PIN_RESET);
 			  HAL_Delay(1000);
 		  }
 

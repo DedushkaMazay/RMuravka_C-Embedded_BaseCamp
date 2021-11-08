@@ -1,6 +1,19 @@
 MemberFilterActionGroup.COutlineViewer.2=true
 MemberFilterActionGroup.COutlineViewer.4=true
+c_braces=217,232,247
+c_comment_task_tag=78,154,6
+c_default=255,255,255
+c_multi_line_comment=78,154,6
+c_single_line_comment=78,154,6
+class_member_ascending_visibility_order=false
 eclipse.preferences.version=1
+formatter_profile=org.eclipse.cdt.ui.default.kandr_profile
+formatter_settings_version=1
+function_output_parameters_before_input=false
+function_pass_output_parameters_by_pointer=false
+hoverModifierMasks=org.eclipse.cdt.ui.BestMatchHover;0;org.eclipse.cdt.debug.internal.ui.editors.DebugTextHover;0;org.eclipse.cdt.ui.ProblemHover;0;org.eclipse.cdt.ui.CDocHover;0;org.eclipse.cdt.ui.CMacroExpansionHover;0;org.eclipse.cdt.ui.CSourceHover;131072;org.eclipse.cdt.ui.AnnotationHover;0;
+hoverModifiers=org.eclipse.cdt.ui.BestMatchHover;0;org.eclipse.cdt.debug.internal.ui.editors.DebugTextHover;\!0;org.eclipse.cdt.ui.ProblemHover;\!0;org.eclipse.cdt.ui.CDocHover;\!0;org.eclipse.cdt.ui.CMacroExpansionHover;\!0;org.eclipse.cdt.ui.CSourceHover;Shift;org.eclipse.cdt.ui.AnnotationHover;\!0;
+org.eclipse.cdt.ui.text.templates.custom=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
 spelling_locale_initialized=true
 useAnnotationsPrefPage=true
 useQuickDiffPrefPage=true
