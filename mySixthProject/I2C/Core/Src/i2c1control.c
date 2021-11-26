@@ -12,6 +12,8 @@ void turnON(void) {
 	TxBuff[0] = 0x00;
 	TxBuff[1] = 0x80;
 	HAL_I2C_Master_Transmit(&hi2c1, devId, TxBuff, 2, 1000);
+	TxBuff[1] = 0x01;
+	HAL_I2C_Master_Transmit(&hi2c1, devId, TxBuff, 2, 1000);
 	setNumberLed(address/4);
 
 }
@@ -38,6 +40,8 @@ void setFreq(uint16_t PWMFreq) {
 	TxBuff[0] = 0x00;
 	TxBuff[1] = 0x80;
 	HAL_I2C_Master_Transmit(&hi2c1, devId, TxBuff, 2, 1000);
+	TxBuff[1] = 0x01;
+	HAL_I2C_Master_Transmit(&hi2c1, devId, TxBuff, 2, 1000);
 
 	if (firstEN)
 		setNumberLed(address/4);
@@ -53,9 +57,9 @@ void setNumberLed(uint16_t led) {
 	if (firstEN){
 		TxBuff[0] = address + 3;
 		TxBuff[1] = 0x10;
+		HAL_I2C_Master_Transmit(&hi2c1, devId, TxBuff, 2, 1000);
 	}
 	firstEN = 1;
-	HAL_I2C_Master_Transmit(&hi2c1, devId, TxBuff, 2, 1000);
 	if (led != 0xfa)
 		address = 0x06 + (led - 1) * 4;
 	else
