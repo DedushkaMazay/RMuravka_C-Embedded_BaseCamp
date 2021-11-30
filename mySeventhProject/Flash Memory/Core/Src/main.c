@@ -34,28 +34,24 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
-#define READ 0x03
-#define SECTOR_4KB_ERASE 0x20
-#define CHIP_ERASE 0x60
-#define BYTE_PROGRAM 0x02
-#define RDSR 0x05
-#define EWSR 0x50
-#define WRSR 0x01
-#define WREN 0x06
-#define READ_ID 0x90
-
-#define START_ADDRESS 0x00
-#define MAX_SECTORS 0x1ff
-#define MAX_SIZE_SECTOR 0xfff
-#define MAX_SIZE 0x1fffff
-
-#define ENABLE_WRITE_TO_CHIP 0
+/*Команды необходимые для работы с памятью*/
+#define READ 0x03				//Считывание флеш-памяти(25Мгц)
+#define SECTOR_4KB_ERASE 0x20	//Очистка сектора(4Кб)
+#define CHIP_ERASE 0x60			//Очистка всей памяти
+#define BYTE_PROGRAM 0x02		//Запись одного байта в память
+#define RDSR 0x05				//Считывание регистра состояния
+#define EWSR 0x50				//Получения доступа к регистру записи
+#define WRSR 0x01				//Регистр записи
+#define WREN 0x06				//Разрешение записи
+/*Размеры необходимые для работы с памятью*/
+#define MAX_SECTORS 0x1ff		//Максимальное количество секторов
+#define MAX_SIZE_SECTOR 0xfff	//Размер сектора
+#define MAX_SIZE 0x1fffff		//Размер всей памяти
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0]))
+#define ARRAY_SIZE(x) (sizeof((x)) / sizeof((x)[0])) //Макрос для определения количества елементов в массиве
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -64,17 +60,16 @@ SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-
-enum {
+/*Переменные состояния*/
+enum {//Считывание/Запись необходимые для функции TxRxSPI
 	Read,
 	Write
 };
-
-enum {
+enum {//Включен/Выключен необходимые для функции CE
 	CE_ON,
 	CE_OFF
 };
-
+/*Временная капсула*/
 const uint8_t *time_capsule[] =
 		{
 				"From: Roman Muravka, dinaroma5323@gmail.com\r",
@@ -107,64 +102,89 @@ static void MX_USART3_UART_Init(void);
 static void MX_SPI1_Init(void);
 
 /* USER CODE BEGIN PFP */
-void TxRxSPI(uint8_t* tx, uint8_t* rx, uint32_t sizeTx, uint32_t sizeRx, _Bool WR);
-void EraseMemory(void);
-void ReadMemory(void);
-void WriteToMemory(void);
-void CE(_Bool State);
-void isItBusy(void);
-void EraseSector(void);
-uint16_t scanUart(void);
+/*Функции необходимые для работы с памятью*/
+void CE(_Bool State);																//Включение/Выключение чипа памяти
+void TxRxSPI(uint8_t* tx, uint8_t* rx, uint32_t sizeTx, uint32_t sizeRx, _Bool WR); //Отправка/Прием
+void EraseMemory(void);																//Очистка памяти
+void EraseSector(void);																//Очистка сектора
+void WriteToMemory(void);															//Запись в память
+void ReadMemory(void);																//Считывание содержимого памяти
+void isItBusy(void);																//Проверка готовности приема команд управления
+uint16_t scanUart(void);															//Универсальный ввод в консоль UART
 
+/*printf для вывода через UART*/
 int _write(int file, char *ptr, int len) {
 	HAL_UART_Transmit(&huart3, (uint8_t*) ptr, len, 10);
 	return len;
 }
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+/*Включение/Выключение чипа памяти*/
+////////////////////////////////START CE///////////////////////////////////////////
 void CE(_Bool State) {
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, State);
 }
+////////////////////////////////END CE/////////////////////////////////////////////
 
+/*Отправка/Прием*/
+////////////////////////////////START TxRxSPI///////////////////////////////////////
 void TxRxSPI(uint8_t* tx, uint8_t* rx, uint32_t sizeTx, uint32_t sizeRx, _Bool WR) {
 	uint8_t EnableWrite = WREN;
 	if (WR == Write) {
+		/*Запись*/
+		////////////////////////////////START//////////////////////////////////////////////
+		/*Разрешение записи*/
 		CE(CE_ON);
 		HAL_SPI_Transmit(&hspi1, &EnableWrite, 1, 100);
 		CE(CE_OFF);
-
+		/*Запись*/
 		CE(CE_ON);
 		HAL_SPI_Transmit(&hspi1, tx, sizeTx, 100);
 		CE(CE_OFF);
+		////////////////////////////////END////////////////////////////////////////////////
 	}
 	else{
+		/*Чтение*/
+		////////////////////////////////START/////////////////////////////////////////////
 		CE(CE_ON);
 		HAL_SPI_Transmit(&hspi1, tx, sizeTx, 100);
 		HAL_SPI_Receive(&hspi1, rx, sizeRx, 100);
 		CE(CE_OFF);
+		////////////////////////////////END////////////////////////////////////////////////
 	}
 }
+////////////////////////////////END TxRxSPI////////////////////////////////////////
 
+/*Очистка памяти*/
+////////////////////////////////START EraseMemory//////////////////////////////////
 void EraseMemory(void){
 	uint8_t tx = CHIP_ERASE;
 	TxRxSPI(&tx, NULL, 1, NULL, Write);
 	isItBusy();
 }
+////////////////////////////////END EraseMemory////////////////////////////////////
 
+/*Очистка сектора*/
+////////////////////////////////START EraseSector//////////////////////////////////
 void EraseSector(void){
-	uint8_t tx [4], choose;
-	uint16_t sector_addr = 0x00;
+	uint8_t tx [4], choose; //Массив для отправки команды и переменная для хранения номера вводимого сектора
+	uint16_t sector_addr = 0x00; //Адрес
+	/*Ввод номера сектора*/
+	////////////////////////////////START//////////////////////////////////////////////
 	printf ("\r\n\nPlease enter address(DEC) 0..511: ");
 	fflush(stdout);
 	sector_addr = scanUart();
+	////////////////////////////////END////////////////////////////////////////////////
+	/*Удаление содержимого выбраного сектора*/
+	////////////////////////////////START//////////////////////////////////////////////
 	if (sector_addr < 0x1ff) {
+		/*Проверка на правильность ввода пользователя*/
 		printf("\r\nYou put in the number 0x%x(HEX), right?(y/n): ", sector_addr);
 		fflush(stdout);
 		choose = scanUart();
+		/*Удаление содержимого*/
 		if (choose == 'y' || choose == 'Y') {
 			tx[0] = SECTOR_4KB_ERASE;
 			tx[1] = (uint8_t) (sector_addr >> 4);
@@ -178,22 +198,33 @@ void EraseSector(void){
 	else
 		printf("\n\r!!!WRONG NUMBER!!!\n");
 }
+////////////////////////////////END EraseSector////////////////////////////////////
 
+/*Запись в память*/
+////////////////////////////////START WriteToMemory////////////////////////////////
 void WriteToMemory(void){
-	EraseMemory();
-	uint8_t* string;
-	uint8_t byteCommand[5] = { 0 };
-	uint16_t sector_addr = 0x00;
-	uint16_t address = 0x00;
+	EraseMemory(); //Очистка памяти перед записью
+	uint8_t* string; //Строка из массива временной капсулы
+	uint8_t byteCommand[5] = { 0 };//Массив для отправки команды записи
+	uint16_t sector_addr = 0x00;//Адрес сектора
+	uint16_t address = 0x00;//Адрес ячейки размером 1 байт
 	for (sector_addr = 0; sector_addr < ARRAY_SIZE(time_capsule); sector_addr++){
-		string = time_capsule[sector_addr];
+		/*Запись в память*/
+		////////////////////////////////START//////////////////////////////////////////////
+		string = time_capsule[sector_addr]; //Взятие строки из временной капсулы
 		for (address = 0; *string != '\0'; address++, string++){
-			byteCommand[0] = BYTE_PROGRAM;
-			byteCommand[1] = (uint8_t)(sector_addr >> 4);
-			byteCommand[2] = (uint8_t)((sector_addr << 4) | (address >> 8));
-			byteCommand[3] = (uint8_t)(address & 0xff);
-			byteCommand[4] = *string;
+			/*Запись в сектор*/
+			////////////////////////////////START//////////////////////////////////////////////
+
+			/*Запись и отправка команды (0x02), необходимого адреса состоящего из сектора(s) и ячейки памяти(b), и передаваемого символа */
+			byteCommand[0] = BYTE_PROGRAM;									//00000010 \									/
+			byteCommand[1] = (uint8_t)(sector_addr >> 4);					//0000ssss  \									/
+			byteCommand[2] = (uint8_t)((sector_addr << 4) | (address >> 8));//ssssbbbb   - [0x02][0x0s][0xssbb][0xbb][0xdd]	/
+			byteCommand[3] = (uint8_t)(address & 0xff);						//bbbbbbbb  /									/
+			byteCommand[4] = *string;										//dddddddd /									/
 			TxRxSPI(byteCommand, NULL, 5, NULL, Write);
+
+			/*Проверка на конец строки, заполненость сектора и памяти*/
 			if (*string == '\r') {
 				address++;
 				byteCommand[0] = BYTE_PROGRAM;
@@ -210,69 +241,90 @@ void WriteToMemory(void){
 			if (sector_addr == MAX_SECTORS){
 				printf("The memory is full, the text may not be completed\r\n");
 				break;
-			}
-		}
-	}
-}
 
+			}
+			////////////////////////////////END////////////////////////////////////////////////
+		}
+		////////////////////////////////END////////////////////////////////////////////////
+	}
+
+}
+////////////////////////////////END WriteToMemory//////////////////////////////////
+
+/*Считывание содержимого памяти*/
+////////////////////////////////START ReadMemory///////////////////////////////////
 void ReadMemory(void){
-	uint8_t readData;
-	uint16_t emptySector;
-	uint16_t sector_addr = 0x00;
-	uint16_t address = 0x00;
-	uint8_t readCommand[4];
+	uint8_t readData;			 //Cчитываемый байт памяти
+	uint16_t emptySector;		 //Кол-во пустых секторов
+	uint16_t sector_addr = 0x00; //Адрес сектора
+	uint16_t address = 0x00;	 //Адрес ячейки
+	uint8_t readCommand[4];		 //Массив для отправки команды
 
 	for (sector_addr = 0; sector_addr <= MAX_SECTORS; sector_addr++){
-		if (emptySector < 2){
-		printf("\r\nsector #0x%x (%dKb) //", sector_addr, sector_addr * 4);
-		fflush(stdout);
-		}
+		/*Чтение из памяти*/
+		////////////////////////////////START//////////////////////////////////////////////
+		if (!emptySector)
+			printf("\r\nsector #0x%x (%dKb) //", sector_addr, sector_addr * 4);
 		for (address = 0; address <= MAX_SIZE_SECTOR; address++){
-			readCommand[0] = READ;
-			readCommand[1] = (uint8_t) (sector_addr >> 4);
-			readCommand[2] = (uint8_t) ((sector_addr << 4) | (address >> 8));
-			readCommand[3] = (uint8_t) (address & 0xff);
+			/*Чтение из сектора*/
+			////////////////////////////////START//////////////////////////////////////////////
+
+			/*Запись и отправка команды (0x03), необходимого адреса состоящего из сектора(s) и ячейки памяти(b), и передаваемого символа */
+			readCommand[0] = READ;											  //00000011 \							 /
+			readCommand[1] = (uint8_t) (sector_addr >> 4);					  //0000ssss  \__[0x03][0x0s][0xsb][0xbb]/
+			readCommand[2] = (uint8_t) ((sector_addr << 4) | (address >> 8)); //ssssbbbb  /							 /
+			readCommand[3] = (uint8_t) (address & 0xff);					  //bbbbbbbb /							 /
 			TxRxSPI(readCommand, &readData, 4, 1, Read);
-			if(readData != 0xff){
-				if (emptySector < 2){
+			/*Проверки связаные с пустотой байта и сектора*/
+			if (readData != 0xff) {
+				switch (emptySector) { //Проверка на наличие пустых секторов перед сектором с данными
+				case 0: //Пустых секторов нет
 					printf("%c", readData);
+					//fflush(stdout);
 					emptySector = 0;
+					break;
+				case 1: //1 пустой сектор
+					printf("sector #0x%x (%dKb) //Empty\r\n", sector_addr - 1, (sector_addr - 1) * 4);
+					printf("\r\nsector #0x%x (%dKb) //%c", sector_addr, sector_addr * 4, readData);
+					emptySector = 0;
+					break;
+				case 2: //2 пустых сектора
+					printf("sector #0x%x (%dKb) //Empty\r\n\n", sector_addr - 2, (sector_addr - 2) * 4);
+					printf("sector #0x%x (%dKb) //Empty\r\n", sector_addr - 1, (sector_addr - 1) * 4);
+					printf("\r\nsector #0x%x (%dKb) //%c", sector_addr, sector_addr * 4, readData);
+					emptySector = 0;
+					break;
+				default: //Больше двух секторов
+					printf("sector #0x%x...#0x%x //Empty\r\n", sector_addr - emptySector, sector_addr - 1);
+					printf("\r\nsector #0x%x (%dKb) //%c", sector_addr, sector_addr * 4, readData);
+					emptySector = 0;
+					break;
 				}
-				else
-					switch(emptySector){
-					case 2:
-						printf("\r\nsector #0x%x (%dKb) //Empty", sector_addr - 1, (sector_addr - 1) * 4);
-						printf("\r\nsector #0x%x (%dKb) //%c", sector_addr, sector_addr * 4);
-						emptySector = 0;
-						break;
-					case 3:
-						printf("\r\nsector #0x%x (%dKb) //Empty", sector_addr - 2, (sector_addr - 2) * 4);
-						printf("\r\nsector #0x%x (%dKb) //Empty", sector_addr - 1, (sector_addr - 1) * 4);
-						printf("\r\nsector #0x%x (%dKb) //%c", sector_addr, sector_addr * 4);
-						emptySector = 0;
-						break;
-					default:
-						printf("\r\nsector #0x%x...#0x%x //Empty", sector_addr - (emptySector - 2), sector_addr - 1);
-						printf("\r\nsector #0x%x (%dKb) //%c", sector_addr, sector_addr * 4);
-						emptySector = 0;
-						break;
-					}
 			}
-			else if(address == 0){
-				if(emptySector < 2)
-					printf("Empty!!!\r\n");
-				emptySector++;
+
+			else if(address == 0x00){
+				if(!emptySector)
+					printf("\r");
+				emptySector++; //Найден пустой сектор
 				break;
 			}
+
 			else
 				break;
+
+			////////////////////////////////END////////////////////////////////////////////////
 		}
+		////////////////////////////////END////////////////////////////////////////////////
 	}
-	if (emptySector > 2){
-				printf("\r\nsector #0x%x...#0x%x //Empty!!!", MAX_SECTORS - (emptySector - 2), MAX_SECTORS);
+	/*Вывод количества пустых секторов после которых нет секторов с данными*/
+	if (emptySector){
+				printf("sector #0x%x...#0x%x //Empty!!!\r\n\n", (MAX_SECTORS - emptySector) + 1, MAX_SECTORS);
 			}
 }
+////////////////////////////////END ReadMemory/////////////////////////////////////
 
+/*Проверка готовности приема команд управления*/
+////////////////////////////////START IsItBusy/////////////////////////////////////
 void isItBusy(void){
 	uint8_t readCommand = RDSR;
 	uint8_t readRegister = 0;
@@ -280,9 +332,10 @@ void isItBusy(void){
 	TxRxSPI(&readCommand, &readRegister, 1,1 , Read);
 	while(readRegister & 0x01);
 }
+////////////////////////////////END IsItBusy///////////////////////////////////////
 
-
-
+/*Универсальный ввод в консоль UART*/
+////////////////////////////////START scanUart/////////////////////////////////////
 uint16_t scanUart(void) { //Универсальный ввод
 	uint8_t enter = 0, scan[4] = { 0 }, i = 0, countLett = 0;
 	uint16_t result = 0;
@@ -342,6 +395,7 @@ uint16_t scanUart(void) { //Универсальный ввод
 
 	Return: return result;
 }
+////////////////////////////////END scanUart///////////////////////////////////////
 /* USER CODE END 0 */
 
 /**
@@ -380,9 +434,11 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
 	HAL_Delay(100);
-	uint8_t choose = 0;
-	uint8_t TxArray [2] = { 0 };
+	uint8_t choose = 0; //Переменная которая хранит данные ввода с главного меню
+	uint8_t TxArray [2] = { 0 }; //Массив для отключения защиты от записи
 
+/*Получение  разрешения для измения регистра записи и отключение защиты от записи*/
+	////////////////////////////////START//////////////////////////////////////////////
 	CE(0);
 	TxArray[0] = EWSR;
 	HAL_SPI_Transmit(&hspi1, TxArray, 1, 100);
@@ -392,19 +448,26 @@ int main(void) {
 	TxArray[1] = 0;
 	HAL_SPI_Transmit(&hspi1, TxArray, 2, 100);
 	CE(1);
+	////////////////////////////////END////////////////////////////////////////////////
+
 	while (1) {
-		printf("\r\n\n\nAction options:\r\n");
-		printf("\t1 - Clear the memory\r\n");
-		printf("\t2 - Write to memory\r\n");
-		printf("\t3 - Read the contents of memory\r\n");
-		printf("\t4 - Сlear memory sector(4Kb)\r\n\n");
-		printf("\n\rYour choice(After entering, press ENTER): ");
+/*Главное меню управления флеш-памятью*/
+		////////////////////////////START//////////////////////////////////////////////
+		printf("\r\n\n\nAction options:\r\n");						//Варианты действий
+		printf("\t1 - Clear the memory\r\n");						//Очистить память
+		printf("\t2 - Write to memory\r\n");						//Запись в память временной капсулы
+		printf("\t3 - Read the contents of memory\r\n");			//Прочитать содержимое памяти
+		printf("\t4 - Сlear memory sector(4Kb)\r\n\n");				//Очистить сектор памяти размером 4Кб
+		printf("\n\rYour choice(After entering, press ENTER): ");	//Поле для ввода (после ввода нажать Enter)
 		fflush(stdout);
 		choose = scanUart(); //Ввод
+		////////////////////////////END////////////////////////////////////////////////
 
+/*Действия относительно введенных данных*/
+		////////////////////////////START//////////////////////////////////////////////
 		switch (choose) {
-		case 1: //
-			printf("\r\n\tAre you sure you want to clear the contents of memory(y/n)? ");
+		case 1: //Очистка памяти
+			printf("\r\n\tAre you sure you want to clear the contents of memory(y/n)? ");//Проверка на случайный ввод
 			fflush(stdout);
 			choose = scanUart();
 			if (choose == 'y' || choose == 'Y'){
@@ -414,8 +477,8 @@ int main(void) {
 			}
 			break;
 
-		case 2: //
-			printf("\r\n\tAre you sure that you want to write new data, all data will be cleared before writing(y/n)? ");
+		case 2: //Запись в память
+			printf("\r\n\tAre you sure that you want to write new data, all data will be cleared before writing(y/n)? ");//Проверка на случайный ввод
 			fflush(stdout);
 			choose = scanUart();
 			if (choose == 'y' || choose == 'Y'){
@@ -425,13 +488,13 @@ int main(void) {
 			}
 			break;
 
-		case 3: //
+		case 3: //Считывание содержимого памяти
 			printf("\r\n\n\n...DATA READING STARTED...\r\n");
 			ReadMemory();
-			printf("\r\n\n\n.../MEMORY CONTENT READ\\...\r\n");
+			printf("\r\n.../MEMORY CONTENT READ\\...\r\n\n\n");
 			break;
 
-		case 4: //
+		case 4: //Очистка сектора памяти
 			printf("\r\n\n\n...CLEARING SECTOR...\r\n");
 			EraseSector();
 			printf("\r\n\n\n.../SECTOR IS CLEAR\\...\r\n");
@@ -441,6 +504,7 @@ int main(void) {
 			printf("\n\r!!!WRONG NUMBER!!!\n");
 			break;
 		}
+		////////////////////////////END////////////////////////////////////////////////
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
